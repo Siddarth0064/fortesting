@@ -32,3 +32,18 @@ func (a *Auth) GenerateToken(claims jwt.RegisteredClaims) (string, error) {
 
 	return tokenStr, nil
 }
+func (a *Auth) ValidateToken(token string) (jwt.RegisteredClaims, error) {
+	var c jwt.RegisteredClaims
+	// Parse the token with the registered claims.
+	tkn, err := jwt.ParseWithClaims(token, &c, func(token *jwt.Token) (interface{}, error) {
+		return a.publicKey, nil
+	})
+	if err != nil {
+		return jwt.RegisteredClaims{}, fmt.Errorf("parsing token %w", err)
+	}
+	// Check if the parsed token is valid.
+	if !tkn.Valid {
+		return jwt.RegisteredClaims{}, errors.New("invalid token")
+	}
+	return c, nil
+}

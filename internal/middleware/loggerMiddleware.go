@@ -19,7 +19,7 @@ func NewMiddleware(a *auth.Auth) (Middleware, error) {
 
 type key string
 
-const TraceIdKey key = "2"
+const TraceIdKey key = "1"
 
 func (m Middleware) Log() gin.HandlerFunc {
 

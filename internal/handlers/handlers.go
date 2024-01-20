@@ -14,5 +14,6 @@ func ApiEndPoints(a *auth.Auth, s *services.Service) *gin.Engine {
 	//m, _ := middleware.NewMiddleware(a)
 	r.POST("/signUp", h.PatientSignup)
 	r.POST("/login", h.PatientLogin)
+	r.POST("/addPatientInformation/:number/detailes", (h.AddingPatientDeatils))
 	return r
 }

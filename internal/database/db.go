@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	//model "hospetal/internal/models"
+
 	//"hospetal/internal/models"
 	"time"
 
@@ -37,7 +39,8 @@ func Connection() (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error in PingContext %w", err)
 	}
-	// db.Migrator().DropTable(&model.Department{}, &model.Doctor{}, &model.Patient{}, &model.PetienUser{}, &model.UserLogin{}, &model.UserSignUp{})
+
+	//db.Migrator().DropTable(&model.PatienDeatiles{}, &model.PetienUser{})
 	// err = db.Migrator().AutoMigrate(&model.UserLogin{}, &model.UserSignUp{}, &model.PetienUser{})
 	// if err != nil {
 	// 	return nil, fmt.Errorf("Error in Auto Migrate DataBase %w", err)

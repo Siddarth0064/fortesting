@@ -3,8 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"hospetal/internal/auth"
 	model "hospetal/internal/models"
+	"strconv"
 
 	//"hospetal/internal/handlers"
 	"hospetal/internal/middleware"
@@ -65,7 +67,7 @@ func (h *Handler) PatientLogin(c *gin.Context) {
 	ctx := c.Request.Context()
 	traceId, ok := ctx.Value(middleware.TraceIdKey).(string)
 	if !ok {
-		log.Error().Str("traceId", traceId).Msg("trace id not found in userSignin handler")
+		log.Error().Str("traceId", traceId).Msg("trace id not found in userLogin handler")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		//return
 	}
@@ -98,5 +100,37 @@ func (h *Handler) PatientLogin(c *gin.Context) {
 
 	}
 
-	c.JSON(http.StatusOK, token)
+	c.JSON(http.StatusOK, gin.H{"TOKEN ": token})
+}
+
+func (h *Handler) AddingPatientDeatils(c *gin.Context) {
+	ctx := c.Request.Context()
+	traceId, ok := ctx.Value(middleware.TraceIdKey).(string)
+	if !ok {
+		log.Error().Str("traceId", traceId).Msg("trace id not found in Adding Patient Deatils handler")
+		//c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		//return
+	}
+	id, err := strconv.ParseUint(c.Param("number"), 10, 32)
+	if err != nil {
+		log.Error().Stack().Msg("Error in parameter of adding patient details ")
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": http.StatusText(http.StatusBadRequest)})
+		return
+	}
+	fmt.Println(id, "======================================")
+	var PatienDeatiles model.PatienDeatiles
+	body := c.Request.Body
+	err = json.NewDecoder(body).Decode(&PatienDeatiles)
+	if err != nil {
+		log.Error().Err(err).Msg("error in decoding Patient detailes")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+	us, err := h.ps.CreatePatientDtls(PatienDeatiles, id)
+	if err != nil {
+		log.Error().Err(err).Str("Trace Id", traceId).Msg("Error in creating data of patient deatils")
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "Error in creating data of patient deatils"})
+		return
+	}
+	c.JSON(http.StatusOK, us)
 }

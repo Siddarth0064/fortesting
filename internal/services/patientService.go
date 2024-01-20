@@ -28,6 +28,7 @@ func NewService(p repository.Patient, d repository.Doctor) (*Service, error) {
 type Patient interface {
 	PatientSignup(ps model.UserSignUp) (model.PetienUser, error)
 	Userlogin(ps model.UserLogin) (jwt.RegisteredClaims, error)
+	CreatePatientDtls(pc model.PatienDeatiles, id uint64) (model.PatienDeatiles, error)
 }
 
 func (s *Service) PatientSignup(ps model.UserSignUp) (model.PetienUser, error) {
@@ -66,4 +67,19 @@ func (s *Service) Userlogin(ps model.UserLogin) (jwt.RegisteredClaims, error) {
 	}
 
 	return c, nil
+}
+func (s *Service) CreatePatientDtls(pc model.PatienDeatiles, id uint64) (model.PatienDeatiles, error) {
+	fpho, err := s.p.FetchUserByPhono(id)
+	fmt.Println(fpho.PhoNo, "===============================")
+	if err != nil {
+		log.Error().Err(err).Msg("couldnot fetch the parameter of phone number in creatring patient deatiels")
+	}
+	PatDetls := model.PatienDeatiles{BloodGroup: pc.BloodGroup, Age: pc.Age, Place: pc.Place, Disease: pc.Disease, PetienUser: model.PetienUser{UserName: fpho.UserName, Email: fpho.Email, PhoNo: fpho.PhoNo}}
+	cu, err := s.p.CreatePD(PatDetls)
+	if err != nil {
+		log.Error().Err(err).Msg("couldnot create patient details")
+		return model.PatienDeatiles{}, errors.New("patient  creation failed")
+	}
+
+	return cu, nil
 }
